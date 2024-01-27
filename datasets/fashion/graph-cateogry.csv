@@ -1,0 +1,11 @@
+,source,target,weight
+0,Dress,Jeans,358
+1,Dress,Shoes,332
+2,Dress,Sweater,280
+3,Dress,T-shirt,302
+4,Jeans,Shoes,396
+5,Jeans,Sweater,341
+6,Jeans,T-shirt,382
+7,Shoes,Sweater,318
+8,Shoes,T-shirt,358
+9,Sweater,T-shirt,296

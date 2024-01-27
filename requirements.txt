@@ -1,5 +1,7 @@
-pandas==2.2.0
+d3graph==2.5.0
 matplotlib==3.8.2
-tensorflow==2.15.0
 scikit-learn==1.4.0
+pandas==2.2.0
+plotly==5.18.0
 streamlit==1.30.0
+tensorflow==2.15.0

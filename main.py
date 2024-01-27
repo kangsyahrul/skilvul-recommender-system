@@ -4,15 +4,14 @@ import streamlit as st
 import tensorflow as tf
 
 st.title('Product Recommendation System')
-'''Welcome to Product Recommender System. This app utilize public dataset that can be 
+'''Welcome to :orange[**Product Recommender System**]. This app utilize public dataset that can be 
 found in [bhanupratapbiswas/fashion-products](https://www.kaggle.com/datasets/bhanupratapbiswas/fashion-products).
 
 For more details about this code, you can see the [github code here](https://github.com/kangsyahrul/skilvul-recommender-system).
 
 This app contains several pages that can be used by marketing team:
-1. [database](/database): explore the details of current state of database
-2. [analysis](/analysis): analyze available dataset to give some insights
-3. [recommendation](/recommendation): predict what will be next item purchased
+1. [analysis](/analysis): exploratory data analysis
+2. [recommendation](/recommendation): predict what will be next item purchased
 '''
 st.divider()
 
@@ -29,7 +28,7 @@ st.header('Recommender System Algorithm')
 '''
 This apps uses several algorithms to recommend products to the customer. 
 1. `Cosine Similiarity`: search other user that has similar personalization and recommends the products.
-2. `Autoencoder`: use neural network to map current purchased products with other products that are likely to purchase.
+2. `Neural Networks (Autoencoder)`: use neural network to map current purchased products with other products that are likely to purchase.
 '''
 st.divider()
 
@@ -37,7 +36,7 @@ st.header('Web Application')
 '''
 This apps uses [streamlit.io](https://streamlit.io/) python based web frame work and deploy to [Azure Webb App](https://azure.microsoft.com/en-us/products/app-service/web).
 
-How to run this app locally (code in macos/linux based, windows OS need to adapat the code):
+How to run this app locally (code in macos/linux based, windows OS need to be adjusted):
 1. Create virtual environment
     - `python -m venv venv`
 2. Activate environment
