@@ -9,11 +9,13 @@ def load_graph_content(path):
     return open(path, 'r', encoding='utf-8').read() 
 
 st.title('Exploratory Data Analysis')
+'''Let's explore the data. What unique things can be found from that.'''
 st.divider()
 
 
 # Dataset
 st.header('Dataset')
+'''Below are the datasets that we used to. Let's have a look at it.'''
 df_interaction = pd.read_csv('datasets/fashion/customer_interactions.csv', sep=',')
 df_product = pd.read_csv('datasets/fashion/product_details.csv', sep=';')
 df_purchase = pd.read_csv('datasets/fashion/purchase_history.csv', sep=';')
@@ -58,7 +60,7 @@ st.divider()
 
 # Customer Interactions
 st.header('Customer Performance')
-
+'''Let's understand how the customer interact with our thouchpoint.'''
 tab_customer, tab_items, tab_interaction = st.tabs(['Performance', 'Purchased Items', 'Interactions'])
 with tab_customer:
     st.markdown('Show how many time and money they spend.')
@@ -92,7 +94,7 @@ st.divider()
 
 # Product Performance
 st.header('Product Performance')
-'''Understanding how each product category perfromed in the market'''
+'''Understand how each product category performs in the market'''
 tab_rating, tab_price, tab_purchased = st.tabs(['Ratings', 'Price', 'Total Purchased'])
 with tab_rating:
     fig = px.box(
@@ -163,11 +165,25 @@ st.markdown('Expensive products also have some small ratings. Products which hav
 st.divider()
 
 st.header('Product Relationship')
-tab_cat, tab_sub = st.tabs(['Category', 'Brand'])
+'''Understand how the product affect each other using graph visualization.
+
+:orange[**Note**]: move the graph to the left or right if it is not displayed.
+'''
+tab_cat, tab_brand, tab_sub = st.tabs(['Category', 'Brand', 'Category + Brand'])
 with tab_cat:
     grpah_content = load_graph_content('models/graph/category.html') 
-    components.html(grpah_content, height=800)
+    components.html(grpah_content, height=600)
+    st.markdown('People who buy `Jeans`, the also tend to buy `T-Shirt` or `Shoes` or :orange[vice versa].')
+
+with tab_brand:
+    grpah_content = load_graph_content('models/graph/brand.html')
+    components.html(grpah_content, height=600)
+    st.markdown('Mostly people who buy `Nike`, they also likely to buy `Zara` or :orange[vice versa].')
+
 
 with tab_sub:
-    grpah_content = load_graph_content('models/graph/brand.html')
-    components.html(grpah_content, height=800)
+    grpah_content = load_graph_content('models/graph/category-brand.html')
+    components.html(grpah_content, height=600)
+    st.markdown('When we set Edge Threshold to around 40, we can see which product they buy together.')
+    st.markdown('1. People who buy `Jeans_Gucci` also buy `Shoes_Gucci` or `T-Shirt_Nike`, :orange[vice versa]')
+    st.markdown('2. People who buy `Jeans_Nike` also buy `Dress_Adidas` or `Jeans_Jara` or `Jeans_H&M`, :orange[vice versa]')

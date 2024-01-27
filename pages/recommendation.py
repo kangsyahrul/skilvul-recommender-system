@@ -6,9 +6,9 @@ import tensorflow as tf
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-@st.cache_data
-def load_model():
-    return tf.keras.models.load_model('models/FCN/model')
+# @st.cache_data
+def load_model(model):
+    return tf.keras.models.load_model(f'models/{model}/model')
 
 @st.cache_data
 def load_matrix(df_dataset, total_user, total_product):
@@ -26,7 +26,7 @@ total_user = len(df_dataset['customer_id'].unique())
 total_product = len(df_dataset['product_id'].unique())
 matrix = load_matrix(df_dataset, total_user, total_product)
 
-st.title('Prediction')
+st.title('Recommendation System')
 st.divider()
 
 prediction_methods = ['By Customer ID', 'Select Products Manually']
@@ -54,7 +54,6 @@ else:
                 default=False,
             )
         },
-        # disabled=["widgets"],
         hide_index=True,
     )
     df_buy = df_buy[df_buy['buy']].drop(columns=['buy'])
@@ -69,20 +68,27 @@ products_on_chart = df_buy['product_id'].tolist()
 df_product_pred = pd.DataFrame([], columns=df_product.columns)
 predict_customer = st.button('Predict', type='primary')
 if predict_customer:
+    st.session_state['products_on_chart'] = products_on_chart
     x = np.zeros((1, total_product))
     x[0, products_on_chart] = 1
 
-    # Deep Learning
-    model = load_model()
-    y = model(x)
+    # # Neural Nets
+    # model_nn = load_model('NN')
+    # y_nn = model_nn(x)
+
+    # Autoencoder
+    model_fauto = load_model('autoencoder')
+    y_auto = model_fauto(x)
 
     # Cosine Similarity
     item_similarity = cosine_similarity(matrix.T)
+    item_scores = x.dot(item_similarity)[0]
 
     # Result
     df_product_pred = df_product.copy()
-    df_product_pred['score_nn'] = list(y.numpy()[0])
-    df_product_pred['score_cosine'] = x.dot(item_similarity)[0]
+    # df_product_pred['neural_net'] = list(y_nn.numpy()[0])
+    df_product_pred['autoencoder'] = list(y_auto.numpy()[0])
+    df_product_pred['cosine'] = item_scores
     df_product_pred = df_product_pred.reset_index(drop=True)
     st.session_state['df_product_pred'] = df_product_pred
 
@@ -90,13 +96,28 @@ if predict_customer:
 st.divider()
 st.header('Recommendation Products')
 
+if products_on_chart != st.session_state.get('products_on_chart', []):
+    st.warning('Change has been made, click "Predict" to view result.')
+
+if prediction_method == 'By Customer ID':
+    st.info(':orange[**Note:**] predicting current user is better to use :green[Cosine Similarity].')
+
 col_model, col_top = st.columns([2, 5])
-model = col_model.radio('Model (Sort score by)', ['Neural Networks', 'Cosine Similarity'])
+model = col_model.radio('Model (Sort score by)', ['Autoencoder', 'Cosine Similarity'], index=1 if prediction_method == 'By Customer ID' else 0) #, disabled=prediction_method == 'By Customer ID')
 n = col_top.slider('Top Recommendation Product', 1, 50, 10)
 
-df_product_pred = st.session_state.get("df_product_pred", pd.DataFrame([], columns=df_product.columns))
+df_product_pred = st.session_state.get("df_product_pred", None)
+if df_product_pred is None:
+    st.warning('Please click predict to view the result.')
+    st.stop()
+
 df_product_pred = df_product_pred[~df_product_pred['product_id'].isin(products_on_chart)]
-df_product_pred = df_product_pred.sort_values(by='score_nn' if model == 'Neural Networks' else 'score_cosine', ascending=False)
+if model == 'Autoencoder':
+    df_product_pred = df_product_pred.sort_values(by='autoencoder', ascending=False)
+# elif model == 'Neural Networks':
+#     df_product_pred = df_product_pred.sort_values(by='neural_net', ascending=False)
+else:
+    df_product_pred = df_product_pred.sort_values(by='cosine', ascending=False)
 df_product_pred = df_product_pred.reset_index(drop=True)
 
 print()
@@ -105,19 +126,26 @@ st.dataframe(
     column_config={
         "price": st.column_config.NumberColumn(format="%.3f"),
         "ratings": st.column_config.NumberColumn(format="%.3f"),
-        "score_nn": st.column_config.ProgressColumn(
-            "score_nn",
-            help="score_nn",
+        "autoencoder": st.column_config.ProgressColumn(
+            "autoencoder",
+            help="autoencoder",
             format="%.3f",
-            min_value=float(df_product_pred['score_nn'].min()),
-            max_value=float(df_product_pred['score_nn'].max()),
+            min_value=0, #float(df_product_pred['autoencoder'].min()),
+            max_value=1, #float(df_product_pred['autoencoder'].max()),
         ),
-        "score_cosine": st.column_config.ProgressColumn(
-            "score_cosine",
-            help="score_cosine",
+        "neural_net": st.column_config.ProgressColumn(
+            "neural_net",
+            help="neural_net",
             format="%.3f",
-            min_value=float(df_product_pred['score_cosine'].min()),
-            max_value=float(df_product_pred['score_cosine'].max()),
+            min_value=0, #float(df_product_pred['neural_net'].min()),
+            max_value=1, #float(df_product_pred['neural_net'].max()),
+        ),
+        "cosine": st.column_config.ProgressColumn(
+            "cosine",
+            help="cosine",
+            format="%.3f",
+            min_value=float(df_product_pred['cosine'].min()),
+            max_value=float(df_product_pred['cosine'].max()),
         ),
     },
     use_container_width=True

@@ -27,9 +27,23 @@ st.divider()
 st.header('Recommender System Algorithm')
 '''
 This apps uses several algorithms to recommend products to the customer. 
-1. `Cosine Similiarity`: search other user that has similar personalization and recommends the products.
-2. `Neural Networks (Autoencoder)`: use neural network to map current purchased products with other products that are likely to purchase.
+1. `Cosine Similiarity`: search other user that has similar personalization and recommends the products. :orange[It is good for predicting next items from current user].
+3. `Autoencoder`: use autoencoder architecture shown in below image by mapping current purchased products with other products that are likely to purchase. :blue[It is good for predicting from custom items].
 '''
+st.image('images/autoencoder.png', 'Autoencoder architecture')
+
+'''To use autoencoder, we need to build dataset by :blue[randomly masking actual purchased product] as `input` while `output` is the :violet[actual purchased product] by the customer.
+
+For example:
+'''
+st.dataframe(
+    pd.DataFrame({
+        'category': ['Dress', 'Jeans', 'Shoes', 'Sweater', 'T-shirt'],
+        'input (masked)': [0, 1, 0, 0, 0],
+        'output (actual purchased product)': [1, 1, 0, 1, 0],
+    })
+)
+'''The model was already trained using notebook at `notebooks/modelling.ipynb`'''
 st.divider()
 
 st.header('Web Application')
